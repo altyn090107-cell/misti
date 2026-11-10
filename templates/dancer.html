@@ -78,73 +78,65 @@
 
 let currentFullText = ""; // Переменная для хранения текущего полного текста реплики
 
-    // Функция побуквенной печати
+   // Функция побуквенной печати
     function typeWriter(text, i = 0) {
         isTyping = true;
-        currentFullText = text; // Сохраняем полный текст реплики
+        currentFullText = text;
 
         if (i === 0) {
             textEl.innerText = "";
         }
 
-        // Если во время печати игрок нажал на кнопку, прерываем цикл и выводим текст целиком
-        if (!isTyping) {
-            textEl.innerText = currentFullText;
-            return;
-        }
-
         if (i <= text.length) {
             textEl.innerText = text.substring(0, i);
 
+            // Озвучка каждой буквы (кроме пробелов)
             if (i > 0 && text.charAt(i - 1) !== " ") {
                 beepSound.currentTime = 0;
                 beepSound.play().catch(() => {});
             }
 
-            setTimeout(() => typeWriter(text, i + 1), 35);
+            // Задержка между буквами (35 миллисекунд)
+            typingTimer = setTimeout(() => typeWriter(text, i + 1), 35);
         } else {
             isTyping = false; // Текст полностью напечатался
         }
     }
 
-    let typingTimer = null; // Таймер для отслеживания анимации текста
-
     function nextLine() {
-        // Если текст печатается — прерываем печать и показываем фразу целиком
+        // УСЛОВИЕ 1: Если текст СЕЙЧАС печатается — по клику мгновенно допечатываем его до конца
         if (isTyping) {
-            clearTimeout(typingTimer);
+            clearTimeout(typingTimer); // Останавливаем таймер печати
             isTyping = false;
-            textEl.innerText = currentFullText;
-            return;
+            textEl.innerText = currentFullText; // Выводим всю фразу сразу
+            return; // Выходим, чтобы шаг пока не увеличивался
         }
 
-        // Если дошли до конца массива — переходим на финал
-        if (step >= lines.length) {
+        // УСЛОВИЕ 2: Если текст уже полностью виден — переходим к следующей реплике
+        if (step < lines.length) {
+            const currentLine = lines[step];
+
+            // Меняем спрайт, если он есть
+            if (currentLine.sprite) {
+                spriteEl.src = "/static/" + currentLine.sprite;
+            }
+
+            // Звук скримера на самой последней фразе
+            if (step === lines.length - 1) {
+                screamSound.currentTime = 0;
+                screamSound.play().catch(() => {});
+            }
+
+            // Запускаем печать новой строки
+            typeWriter(currentLine.text);
+            step++;
+        } else {
+            // Если диалог закончился — переходим на финал
             window.location.href = "/finale";
-            return;
         }
-
-        const currentLine = lines[step];
-
-        // Меняем спрайт
-        if (currentLine.sprite) {
-            spriteEl.src = "/static/" + currentLine.sprite;
-        }
-
-        // Звук скримера на последней фразе
-        if (step === lines.length - 1) {
-            screamSound.currentTime = 0;
-            screamSound.play().catch(() => {});
-        }
-
-        // Запускаем печать строки и увеличиваем шаг
-        typeWriter(currentLine.text);
-        step++;
     }
 
-    // Сбрасываем шаг на 0, чтобы по первому клику началась первая фраза
-    step = 0;
-    // Автоматически запускаем первую строчку при загрузке страницы
+    // Автоматически запускаем самую первую строчку при открытии страницы
     nextLine();
     </script>
 </body>
