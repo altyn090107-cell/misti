@@ -106,33 +106,29 @@ let currentFullText = ""; // Переменная для хранения тек
         }
     }
 
-    function nextLine() {
-        // Если текст еще печатается, клик мгновенно выводит всю фразу целиком и разблокирует кнопку
-        if (isTyping) {
-            isTyping = false; 
-            textEl.innerText = currentFullText; // Показываем весь текст сразу
-            return;
+    let typingTimer = null; // Таймер для отслеживания анимации текста
+
+    // Функция побуквенной печати
+    function typeWriter(text, i = 0) {
+        isTyping = true;
+        currentFullText = text;
+
+        if (i === 0) {
+            textEl.innerText = "";
         }
 
-        if (step < lines.length) {
-            const currentLine = lines[step];
+        if (i <= text.length) {
+            textEl.innerText = text.substring(0, i);
 
-            //  спрайт — меняем его
-            if (currentLine.sprite) {
-                spriteEl.src = "/static/" + currentLine.sprite;
+            if (i > 0 && text.charAt(i - 1) !== " ") {
+                beepSound.currentTime = 0;
+                beepSound.play().catch(() => {});
             }
 
-            // включаем звук скримера
-            if (step === lines.length - 1) {
-                screamSound.currentTime = 0;
-                screamSound.play().catch(() => {});
-            }
-
-            // Печатаем текст
-            typeWriter(currentLine.text);
-            step++;
+            // Сохраняем ID таймера, чтобы его можно было остановить кликом
+            typingTimer = setTimeout(() => typeWriter(text, i + 1), 35);
         } else {
-            window.location.href = "/finale";
+            isTyping = false;
         }
     }
 
