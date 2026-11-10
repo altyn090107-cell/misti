@@ -109,30 +109,41 @@ let currentFullText = ""; // Переменная для хранения тек
 
     let typingTimer = null; // Таймер для отслеживания анимации текста
 
-    // Функция побуквенной печати
-    function typeWriter(text, i = 0) {
-        isTyping = true;
-        currentFullText = text;
-
-        if (i === 0) {
-            textEl.innerText = "";
-        }
-
-        if (i <= text.length) {
-            textEl.innerText = text.substring(0, i);
-
-            if (i > 0 && text.charAt(i - 1) !== " ") {
-                beepSound.currentTime = 0;
-                beepSound.play().catch(() => {});
-            }
-
-            // Сохраняем ID таймера, чтобы его можно было остановить кликом
-            typingTimer = setTimeout(() => typeWriter(text, i + 1), 35);
-        } else {
+    function nextLine() {
+        // Если текст печатается — прерываем печать и показываем фразу целиком
+        if (isTyping) {
+            clearTimeout(typingTimer);
             isTyping = false;
+            textEl.innerText = currentFullText;
+            return;
         }
+
+        // Если дошли до конца массива — переходим на финал
+        if (step >= lines.length) {
+            window.location.href = "/finale";
+            return;
+        }
+
+        const currentLine = lines[step];
+
+        // Меняем спрайт
+        if (currentLine.sprite) {
+            spriteEl.src = "/static/" + currentLine.sprite;
+        }
+
+        // Звук скримера на последней фразе
+        if (step === lines.length - 1) {
+            screamSound.currentTime = 0;
+            screamSound.play().catch(() => {});
+        }
+
+        // Запускаем печать строки и увеличиваем шаг
+        typeWriter(currentLine.text);
+        step++;
     }
 
+    // Сбрасываем шаг на 0, чтобы по первому клику началась первая фраза
+    step = 0;
     // Автоматически запускаем первую строчку при загрузке страницы
     nextLine();
     </script>
