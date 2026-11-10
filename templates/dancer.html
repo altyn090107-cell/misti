@@ -58,7 +58,7 @@
 
 
     <script>
-        let step = 0;
+        let step = 1;
         let isTyping = false;
         const textEl = document.getElementById('text');
         const spriteEl = document.getElementById('dancer-sprite');
@@ -66,6 +66,7 @@
         const screamSound = document.getElementById('scream-audio');
 
         const lines = [
+            { text: "The shadow in the room stirred... A young man stands in first ballet position, en pointe.", sprite: "standingdancer.png" },
             {text: "«?»", sprite: "looking_behind.png" },
             { text: "«Didn't expect to see anyone here, did you? In my past life, what was it, number ninety-nine? No-no a hundred, I used to perform here...»", sprite: "greets.png" },
             { text: "«Back when these rotting walls were still bathed in golden light and applause. But now it's just nothing but abandoned walls and dust.»", sprite: "talking.png" },
