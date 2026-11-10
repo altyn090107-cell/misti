@@ -1,5 +1,5 @@
 
-from os import name
+import os
 import random
 
 from flask import Flask, jsonify, render_template, request
@@ -120,10 +120,16 @@ def dancer():#5
     return render_template('dancer.html')
 
 @app.route('/finale')
-def finale():#6
-    client_ip = request.remote_addr
+def finale():
+    # Получаем реальный IP пользователя через прокси Render (или запасной локальный)
+    if request.headers.get('X-Forwarded-For'):
+        client_ip = request.headers.get('X-Forwarded-For').split(',')[0].strip()
+    else:
+        client_ip = request.remote_addr
+
     if client_ip not in trapped_ips:
         trapped_ips.append(client_ip)
+        
     return render_template('finale.html', ip=client_ip, total=len(trapped_ips))
 
 if __name__ == "__main__":
