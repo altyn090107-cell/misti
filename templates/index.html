@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Ballet Theatre</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dark-bg" style="background-image: url('/static/menu.png'); background-size: cover; background-position: center;">
+    <div class="container">
+        <h1>BALLET THEATRE</h1>
+        
+        
+        <br><br>
+        <a href="/corridor" class="creepy-btn">[ come inside ]</a>
+    </div>
+    <audio id="bg-audio" loop>
+    <source src="{{ url_for('static', filename='music.mp3') }}" type="audio/mpeg">
+    </audio>
+    <script>
+    const audio = document.getElementById('bg-audio');
+
+    // Восстановление времени при переходе между страницами
+    const savedTime = sessionStorage.getItem('audioTime');
+    if (savedTime) {
+        audio.currentTime = parseFloat(savedTime);
+    }
+
+    // Запуск музыки
+    audio.play().catch(() => {});
+
+    // Если браузер заблокировал автозапуск, музыка включится по первому клику в любом месте
+    document.addEventListener('click', () => {
+        if (audio.paused) {
+            audio.play();
+        }
+    }, { once: true });
+
+    // Сохранение времени перед уходом на другую страницу
+    window.addEventListener('beforeunload', () => {
+        sessionStorage.setItem('audioTime', audio.currentTime);
+    });
+    </script>
+</body>
+</html>

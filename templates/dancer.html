@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Behind the Stage</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dark-bg" style="background-image: url('/static/backroom.png'); background-size: cover; background-position: center;">
+    <div class="container">
+        <div id="sprite-container" style="text-align: center; margin-bottom: 20px; background: transparent;">
+            <img id="dancer-sprite" src="{{ url_for('static', filename='standingdancer.png') }}" alt="Танцор" style="max-height: 380px; width: auto; display: block; margin: 0 auto;">
+        </div>
+
+        <div class="box">
+            <p id="text">The shadow in the room stirred... A young man stands in first ballet position, en pointe.</p>
+            <button onclick="nextLine()" class="creepy-btn" id="next-btn">[ Next ]</button>
+        </div>
+    </div>
+
+    <audio id="bg-audio" loop>
+        <source src="{{ url_for('static', filename='music.mp3') }}" type="audio/mpeg">
+    </audio>
+    <script>
+    const audio = document.getElementById('bg-audio');
+
+    // Восстановление времени при переходе между страницами
+    const savedTime = sessionStorage.getItem('audioTime');
+    if (savedTime) {
+        audio.currentTime = parseFloat(savedTime);
+    }
+
+    // Запуск музыки
+    audio.play().catch(() => {});
+
+    // Если браузер заблокировал автозапуск, музыка включится по первому клику в любом месте
+    document.addEventListener('click', () => {
+        if (audio.paused) {
+            audio.play();
+        }
+    }, { once: true });
+
+    // Сохранение времени перед уходом на другую страницу
+    window.addEventListener('beforeunload', () => {
+        sessionStorage.setItem('audioTime', audio.currentTime);
+    });
+    </script>
+    
+    <!-- Звук букв (Undertale) -->
+    <audio id="beep-audio">
+           <source src="{{ url_for('static', filename='gastervoice-voice.mp3') }}" type="audio/mpeg">
+    </audio>
+
+    <!-- Звук скримера -->
+    <audio id="scream-audio">
+          <source src="{{ url_for('static', filename='chara-jumpscare.mp3') }}" type="audio/mpeg">
+    </audio>
+
+
+    <script>
+        let step = 0;
+        let isTyping = false;
+        const textEl = document.getElementById('text');
+        const spriteEl = document.getElementById('dancer-sprite');
+        const beepSound = document.getElementById('beep-audio');
+        const screamSound = document.getElementById('scream-audio');
+
+        const lines = [
+            {text: "«?»", sprite: "looking_behind.png" },
+            { text: "«Didn't expect to see anyone here, did you? In my past life, what was it, number ninety-nine? No-no a hundred, I used to perform here...»", sprite: "greets.png" },
+            { text: "«Back when these rotting walls were still bathed in golden light and applause. But now it's just nothing but abandoned walls and dust.»", sprite: "talking.png" },
+            { text: "«People are so terribly messy, aren't they? They just ruin everything they touch, leaving ugly little stains all over the world. Just like they left me.»", sprite: "talking.png" },
+            { text: "«You're like them, i know that. I've lived hundreds lives to see that exact same ugly little spark hiding behind your eyes.»", sprite: "talking.png" },
+            { text: "«That is why I take such wonderful care of my little list. I don't just punish bad behavior... I make sure you never existed in the first place.»", sprite: "talking.png" },
+            { text: "«Isn't that a mercy? Now... shall we take a bow?»", sprite: "scream.png" }
+        ];
+
+let currentFullText = ""; // Переменная для хранения текущего полного текста реплики
+
+    // Функция побуквенной печати
+    function typeWriter(text, i = 0) {
+        isTyping = true;
+        currentFullText = text; // Сохраняем полный текст реплики
+
+        if (i === 0) {
+            textEl.innerText = "";
+        }
+
+        // Если во время печати игрок нажал на кнопку, прерываем цикл и выводим текст целиком
+        if (!isTyping) {
+            textEl.innerText = currentFullText;
+            return;
+        }
+
+        if (i <= text.length) {
+            textEl.innerText = text.substring(0, i);
+
+            if (i > 0 && text.charAt(i - 1) !== " ") {
+                beepSound.currentTime = 0;
+                beepSound.play().catch(() => {});
+            }
+
+            setTimeout(() => typeWriter(text, i + 1), 35);
+        } else {
+            isTyping = false; // Текст полностью напечатался
+        }
+    }
+
+    function nextLine() {
+        // Если текст еще печатается, клик мгновенно выводит всю фразу целиком и разблокирует кнопку
+        if (isTyping) {
+            isTyping = false; 
+            textEl.innerText = currentFullText; // Показываем весь текст сразу
+            return;
+        }
+
+        if (step < lines.length) {
+            const currentLine = lines[step];
+
+            //  спрайт — меняем его
+            if (currentLine.sprite) {
+                spriteEl.src = "/static/" + currentLine.sprite;
+            }
+
+            // включаем звук скримера
+            if (step === lines.length - 1) {
+                screamSound.currentTime = 0;
+                screamSound.play().catch(() => {});
+            }
+
+            // Печатаем текст
+            typeWriter(currentLine.text);
+            step++;
+        } else {
+            window.location.href = "/finale";
+        }
+    }
+
+    // Автоматически запускаем первую строчку при загрузке страницы
+    nextLine();
+    </script>
+</body>
+</html>

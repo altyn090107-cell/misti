@@ -1,0 +1,136 @@
+
+body.dark-bg {
+    background-color: #030303;
+    /* Картинка на фоне без всяких затемнений */
+    background-image: url('menu.png'); /* Можете менять имя файла под каждую страницу */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    
+    color: #cc0000;
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
+    margin-top: 10vh;
+    cursor: crosshair;
+}
+
+.bg-index { 
+    background-image: url('/static/menu.png'); 
+    background-size: cover;
+    background-position: center;
+}
+.bg-corridor { 
+    background-image: url('/static/corridor.png'); 
+    background-size: cover;
+    background-position: center;
+}
+.bg-room { 
+    background-image: url('/static/backroom.png'); 
+    background-size: cover;
+    background-position: center;
+}
+.bg-dancer { 
+    background-image: url('/static/corridor.png'); 
+    background-size: cover;
+    background-position: center;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Прижимает содержимое к низу */
+    align-items: center;
+    min-height: 100vh;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px;
+    box-sizing: border-box;
+    background: transparent;
+   
+}
+.box {
+    margin-top: 15px;
+    text-align: center;
+    max-width: 700px;
+    background: rgba(5, 2, 2, 0.85); /* Полупрозрачный фон теперь только здесь */
+    padding: 20px;
+    border-radius: 4px;
+}
+
+h1, h2 {
+    letter-spacing: 4px;
+    font-size: 24px;
+    color: #ff1a1a;
+}
+
+.subtitle {
+    color: #882222;
+    font-style: italic;
+}
+
+.creepy-btn {
+    background: #110000;
+    color: #cc0000;
+    border: 1px solid #cc0000;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 20px;
+    transition: 0.2s;
+}
+
+.creepy-btn:hover {
+    background: #cc0000;
+    color: #000;
+   
+}
+
+/* Картинки внутри сайта (пуанты, газета и т.д.) */
+.quest-img {
+    max-width: 80%;
+    height: auto;
+    border: 1px solid #550000;
+    margin: 15px 0;
+}
+
+/* Плеер для музыки (аккуратный снизу экрана) */
+.music-player {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.7;
+    transition: 0.3s;
+}
+.music-player:hover {
+    opacity: 1;
+}
+
+/* Скример */
+#jumpscare {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.screamer-text {
+    color: #ff0000;
+    font-size: 65px;
+    font-weight: bold;
+    letter-spacing: 6px;
+    animation: shake 0.1s infinite;
+}
+
+@keyframes shake {
+    0% { transform: translate(3px, 3px); }
+    50% { transform: translate(-3px, -3px); }
+    100% { transform: translate(3px, -3px); }
+}
+

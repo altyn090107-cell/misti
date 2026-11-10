@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>THEATRE IS CLOSED</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dark-bg">
+
+    <!-- Основной контент (скрыт до окончания скримера) -->
+    <div id="content" class="container" style="display: none; margin-top: 20vh;">
+        <h1>THEATRE IS NOW YOUR HOME</h1>
+        <p>Your IP address: <span style="color:#fff; background:#300; padding:2px 6px;">{{ ip }}</span> has been successfully registered.</p>
+        <p>Total souls trapped: <strong>{{ total }}</strong></p>
+        <br>
+        <p style="color: #660000; font-size: 14px;">You will never leave.</p>
+    </div>
+    <audio id="bg-audio" loop>
+    <source src="{{ url_for('static', filename='music.mp3') }}" type="audio/mpeg">
+    </audio>
+    <script>
+    const audio = document.getElementById('bg-audio');
+
+    // Восстановление времени при переходе между страницами
+    const savedTime = sessionStorage.getItem('audioTime');
+    if (savedTime) {
+        audio.currentTime = parseFloat(savedTime);
+    }
+
+    // Запуск музыки
+    audio.play().catch(() => {});
+
+    // Если браузер заблокировал автозапуск, музыка включится по первому клику в любом месте
+    document.addEventListener('click', () => {
+        if (audio.paused) {
+            audio.play();
+        }
+    }, { once: true });
+
+    // Сохранение времени перед уходом на другую страницу
+    window.addEventListener('beforeunload', () => {
+        sessionStorage.setItem('audioTime', audio.currentTime);
+    });
+    </script>
+
+
+    <!-- Экран скримера со спрайтом -->
+    <div id="jumpscare">
+        <img src="{{ url_for('static', filename='screamer.png') }}" alt="Screamer" class="screamer-img">
+        <h1 class="screamer-text">THERE'S NO ESCAPE</h1>
+        <!-- Аудиоэффект для скримера  -->
+        <audio id="screamer-audio" autoplay>
+        <source src="{{ url_for('static', filename='chara-jumpscare.mp3') }}" type="audio/mpeg">
+    </audio>
+    </div>
+
+    <style>
+        .screamer-img {
+            max-width: 90vw;
+            max-height: 90vh;
+            animation: shake 0.08s infinite;
+        }
+        #jumpscare {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+    </style>
+
+    <script>
+        // Скример длится 1.5 секунды, после чего исчезает и открывается текст
+        setTimeout(() => {
+            document.getElementById('jumpscare').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        }, 1500);
+    </script>
+
+</body>
+</html>

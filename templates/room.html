@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>The stage</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dark-bg" style="background-image: url('/static/stage.png'); background-size: cover; background-position: center;">
+    <div class="container">
+        
+
+        <div id="image-box" style="text-align: center; margin-bottom: 15px; background: transparent;">
+            <img id="room-img" src="/static/balletshoes.png" alt="Inspect Item" class="quest-img" style="max-height: 180px; display: block; margin: 0 auto;">
+        </div>
+
+        <!-- Блок текста -->
+        <div class="box" id="text-box" style="margin-top: 15px;">
+            <p id="room-text">You are examining the stage. You see old ballet shoes and a dusty newspaper lying on the floor.</p>
+        </div>
+
+        <!-- Кнопки управления -->
+        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <button onclick="readArticle()" class="creepy-btn" id="news-btn">[ Read Newspaper ]</button>
+            <button onclick="showShoes()" class="creepy-btn" id="shoes-btn">[ Inspect Shoes ]</button>
+            <a href="/dancer" class="creepy-btn">[ Go behind the stage ]</a>
+        </div>
+    </div>
+    <audio id="bg-audio" loop>
+    <source src="{{ url_for('static', filename='music.mp3') }}" type="audio/mpeg">
+    </audio>
+    <script>
+    const audio = document.getElementById('bg-audio');
+
+    // Восстановление времени при переходе между страницами
+    const savedTime = sessionStorage.getItem('audioTime');
+    if (savedTime) {
+        audio.currentTime = parseFloat(savedTime);
+    }
+
+    // Запуск музыки
+    audio.play().catch(() => {});
+
+    // Если браузер заблокировал автозапуск, музыка включится по первому клику в любом месте
+    document.addEventListener('click', () => {
+        if (audio.paused) {
+            audio.play();
+        }
+    }, { once: true });
+
+    // Сохранение времени перед уходом на другую страницу
+    window.addEventListener('beforeunload', () => {
+        sessionStorage.setItem('audioTime', audio.currentTime);
+    });
+    </script>
+
+    <script>
+        let articleStep = 0;
+        const textEl = document.getElementById('room-text');
+        const imgEl = document.getElementById('room-img');
+        const newsBtn = document.getElementById('news-btn');
+
+        const articleParts = [
+            "«HEADLINE: BRUTAL MURDER OF A POPULAR MALE BALLET DANCER.»",
+            "«'A famous male ballerina-Xavier Hollowmoore, took the stage for the last time,»",
+            "«before getting brutally assaulted, and getting choked to death while being violated»",
+            "«He was found dead nearby his Ballet practice studio, in a quiet almost abandoned alleyway...»",
+            " You read the rest of the article, and find out that he performed his last dance in this theatre.",
+            "You feel a chill run down your spine."
+        ];
+
+        function readArticle() {
+            // Переключаем картинку на газету
+            imgEl.src = "/static/newspaperpy.png";
+            
+            if (articleStep < articleParts.length) {
+                textEl.innerText = articleParts[articleStep];
+                articleStep++;
+                newsBtn.innerText = "[ Continue Reading... ]";
+            } else {
+                textEl.innerText = "«You finished reading the yellowed newspaper. A cold breeze whispers through the empty hall...»";
+                newsBtn.innerText = "[ Read Again ]";
+                articleStep = 0;
+            }
+        }
+
+        function showShoes() {
+            // Переключаем картинку обратно на пуанты
+            imgEl.src = "/static/balletshoes.png";
+            textEl.innerText = "You step closer to the pointe shoes. They look as though they have just been taken off. A chill radiates from them.";
+            
+            // Сбрасываем шаги чтения газеты
+            articleStep = 0;
+            newsBtn.innerText = "[ Read Newspaper ]";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Theatre Corridor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dark-bg" style="background-image: url('/static/corridor.png'); background-size: cover; background-position: center;">
+    <div class="container">
+        <div class="box">
+            <p>You are walking through a dark corridor. The walls emit a strange scraping sound...</p>
+        </div>
+        <br>
+        <div class="nav-links">
+            <a href="/room" class="creepy-btn">The Stage</a> | 
+            <a href="/dancer" class="creepy-btn">Behind the Stage</a>
+        </div>
+    </div>
+    <audio id="bg-audio" loop>
+    <source src="{{ url_for('static', filename='music.mp3') }}" type="audio/mpeg">
+    </audio>
+    <script>
+    const audio = document.getElementById('bg-audio');
+
+    // Восстановление времени при переходе между страницами
+    const savedTime = sessionStorage.getItem('audioTime');
+    if (savedTime) {
+        audio.currentTime = parseFloat(savedTime);
+    }
+
+    // Запуск музыки
+    audio.play().catch(() => {});
+
+    // Если браузер заблокировал автозапуск, музыка включится по первому клику в любом месте
+    document.addEventListener('click', () => {
+        if (audio.paused) {
+            audio.play();
+        }
+    }, { once: true });
+
+    // Сохранение времени перед уходом на другую страницу
+    window.addEventListener('beforeunload', () => {
+        sessionStorage.setItem('audioTime', audio.currentTime);
+    });
+    </script>
+</body>
+</html>
