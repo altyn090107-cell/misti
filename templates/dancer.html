@@ -65,6 +65,12 @@
         const spriteEl = document.getElementById('dancer-sprite');
         const beepSound = document.getElementById('beep-audio');
         const screamSound = document.getElementById('scream-audio');
+        // Предзагрузка всех спрайтов в память браузера, чтобы они не лагали
+        const spriteFiles = ["standingdancer.png", "looking_behind.png", "greets.png", "talking.png", "scream.png"];
+        spriteFiles.forEach(filename => {
+        const img = new Image();
+        img.src = "/static/" + filename;
+    });
 
         const lines = [
             { text: "The shadow in the room stirred... A young man stands in first ballet position, en pointe.", sprite: "standingdancer.png" },
