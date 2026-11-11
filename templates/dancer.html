@@ -9,7 +9,11 @@
 <body class="dark-bg" style="background-image: url('/static/backroom.png'); background-size: cover; background-position: center;">
     <div class="container">
         <div id="sprite-container" style="text-align: center; margin-bottom: 20px; background: transparent;">
-            <img id="dancer-sprite" src="{{ url_for('static', filename='standingdancer.png') }}" alt="Танцор" style="max-height: 380px; width: auto; display: block; margin: 0 auto;">
+            <img id="sprite-standingdancer" src="{{ url_for('static', filename='standingdancer.png') }}" class="dancer-sprite" style="max-height: 380px; width: auto; display: block; margin: 0 auto;">
+            <img id="sprite-looking_behind" src="{{ url_for('static', filename='looking_behind.png') }}" class="dancer-sprite" style="max-height: 380px; width: auto; display: none; margin: 0 auto;">
+            <img id="sprite-greets" src="{{ url_for('static', filename='greets.png') }}" class="dancer-sprite" style="max-height: 380px; width: auto; display: none; margin: 0 auto;">
+            <img id="sprite-talking" src="{{ url_for('static', filename='talking.png') }}" class="dancer-sprite" style="max-height: 380px; width: auto; display: none; margin: 0 auto;">
+            <img id="sprite-scream" src="{{ url_for('static', filename='scream.png') }}" class="dancer-sprite" style="max-height: 380px; width: auto; display: none; margin: 0 auto;">
         </div>
 
         <div class="box">
@@ -73,14 +77,14 @@
     });
 
         const lines = [
-            { text: "The shadow in the room stirred... A young man stands in first ballet position, en pointe.", sprite: "standingdancer.png" },
-            {text: "«?»", sprite: "looking_behind.png" },
-            { text: "«Didn't expect to see anyone here, did you? In my past life, what was it, number ninety-nine? No-no a hundred, I used to perform here...»", sprite: "greets.png" },
-            { text: "«Back when these rotting walls were still bathed in golden light and applause. But now it's just nothing but abandoned walls and dust.»", sprite: "talking.png" },
-            { text: "«People are so terribly messy, aren't they? They just ruin everything they touch, leaving ugly little stains all over the world. Just like they left me.»", sprite: "talking.png" },
-            { text: "«You're like them, i know that. I've lived hundreds lives to see that exact same ugly little spark hiding behind your eyes.»", sprite: "talking.png" },
-            { text: "«That is why I take such wonderful care of my little list. I don't just punish bad behavior... I make sure you never existed in the first place.»", sprite: "talking.png" },
-            { text: "«Isn't that a mercy? Now... shall we take a bow?»", sprite: "scream.png" }
+            { text: "The shadow in the room stirred... A young man stands in first ballet position, en pointe.", sprite: "standingdancer" },
+            {text: "«?»", sprite: "looking_behind" },
+            { text: "«Didn't expect to see anyone here, did you? In my past life, what was it, number ninety-nine? No-no a hundred, I used to perform here...»", sprite: "greets" },
+            { text: "«Back when these rotting walls were still bathed in golden light and applause. But now it's just nothing but abandoned walls and dust.»", sprite: "talking" },
+            { text: "«People are so terribly messy, aren't they? They just ruin everything they touch, leaving ugly little stains all over the world. Just like they left me.»", sprite: "talking" },
+            { text: "«You're like them, i know that. I've lived hundreds lives to see that exact same ugly little spark hiding behind your eyes.»", sprite: "talking" },
+            { text: "«That is why I take such wonderful care of my little list. I don't just punish bad behavior... I make sure you never existed in the first place.»", sprite: "talking" },
+            { text: "«Isn't that a mercy? Now... shall we take a bow?»", sprite: "scream" }
         ];
 
 let currentFullText = ""; // Переменная для хранения текущего полного текста реплики
@@ -123,9 +127,11 @@ let currentFullText = ""; // Переменная для хранения тек
         if (step < lines.length) {
             const currentLine = lines[step];
 
-            // Меняем спрайт, если он есть
+            // Мгновенно переключаем видимость спрайтов без задержек загрузки
             if (currentLine.sprite) {
-                spriteEl.src = "/static/" + currentLine.sprite;
+                document.querySelectorAll('.dancer-sprite').forEach(img => img.style.display = 'none');
+                const activeSprite = document.getElementById('sprite-' + currentLine.sprite);
+                if (activeSprite) activeSprite.style.display = 'block';
             }
 
             // Звук скримера на самой последней фразе
