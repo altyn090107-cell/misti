@@ -58,8 +58,9 @@
 
 
     <script>
-        let step = 1;
+        let step = 0; // Начинаем с нуля, чтобы первая строка и спрайт тоже корректно обрабатывались
         let isTyping = false;
+        let typingTimer = null; // Объявляем таймер, чтобы не было ошибок
         const textEl = document.getElementById('text');
         const spriteEl = document.getElementById('dancer-sprite');
         const beepSound = document.getElementById('beep-audio');
