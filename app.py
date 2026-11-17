@@ -1,22 +1,39 @@
 
+
 import os
 import random
-
 from flask import Flask, jsonify, render_template, request
-#flask — сторонняя библиотека, используемая для создания веб-сервера, обработки маршрутов и запросов.
+
 app = Flask(__name__)
-@app.route('/')
-def index(): #1func
-    fake_ip = f"192.0.2.{random.randint(1, 254)}"
-    print("\n[+] Someone opened Theatre Corridor!", flush=True)
-    print(f"[+] DEMO IP: {fake_ip}", flush=True)
-    print("[+] STATUS: CONNECTED", flush=True)
-    return render_template('index.html')
-#f"..." (f-строка) — вставляет переменную {fake_ip} прямо внутрь текста.   
-#print(..., flush=True) — мгновенно выводит текст в терминал сервера без задержки.  
-#render_template('index.html') — загружает и отправляет в браузер главный HTML-шаблон игры. 
- 
-trapped_ips = []
+# Определяем точную папку, где лежит этот Python-файл
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+VISITED_FILE = os.path.join(BASE_DIR, 'visited_ips.txt')
+TRAPPED_FILE = os.path.join(BASE_DIR, 'trapped_ips.txt')
+
+def load_ips(filename):
+    """Безопасно загружает сохранённые IP из файла при старте сервера."""
+    if not os.path.exists(filename):
+        return []
+    try:
+        with open(filename, 'r', encoding='utf-8', errors='ignore') as f:
+            return [line.strip() for line in f if line.strip()]
+    except Exception as e:
+        print(f"[WARNING] Не удалось прочитать {filename}: {e}", flush=True)
+        return []
+
+def save_ip(ip, ip_list, filename):
+    """Добавляет новый IP в список и дописывает его в файл."""
+    if ip not in ip_list:
+        ip_list.append(ip)
+        try:
+            with open(filename, 'a', encoding='utf-8') as f:
+                f.write(f"{ip}\n")
+        except Exception as e:
+            print(f"[WARNING] Не удалось записать в {filename}: {e}", flush=True)
+    return len(ip_list)
+
+visited_ips = load_ips(VISITED_FILE)
+trapped_ips = load_ips(TRAPPED_FILE)
 
 ROOM_DATA = { #хранилище
     "room": {
