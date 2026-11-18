@@ -6,9 +6,8 @@ from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
 # Определяем точную папку, где лежит этот Python-файл
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-VISITED_FILE = os.path.join(BASE_DIR, 'visited_ips.txt')
-TRAPPED_FILE = os.path.join(BASE_DIR, 'trapped_ips.txt')
+VISITED_FILE = '/tmp/visited_ips.txt'
+TRAPPED_FILE = '/tmp/trapped_ips.txt'
 
 def load_ips(filename):
     """Безопасно загружает сохранённые IP из файла при старте сервера."""
