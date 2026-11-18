@@ -32,6 +32,13 @@ def save_ip(ip, ip_list, filename):
             print(f"[WARNING] Не удалось записать в {filename}: {e}", flush=True)
     return len(ip_list)
 
+def get_real_ip():
+    """Возвращает IP клиента, переданный прокси, или адрес прямого подключения."""
+    forwarded_for = request.headers.get('X-Forwarded-For')
+    if forwarded_for:
+        return forwarded_for.split(',')[0].strip()
+    return request.remote_addr or 'unknown'
+
 visited_ips = load_ips(VISITED_FILE)
 trapped_ips = load_ips(TRAPPED_FILE)
 
