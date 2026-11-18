@@ -94,6 +94,18 @@ ROOM_DATA = { #хранилище
     # []Упорядоченный изменяемый набор элементов
 }
 
+# ВОТ ЭТОТ МАРШРУТ ОТВЕЧАЕТ ЗА ГЛАВНУЮ СТРАНИЦУ (без него была ошибка 404)
+@app.route('/')
+def index():
+    real_ip = get_real_ip()
+    total_visitors = save_ip(real_ip, visited_ips, VISITED_FILE)
+    
+    fake_ip = f"192.0.2.{random.randint(1, 254)}"
+    print("\n[+] Someone opened Theatre Corridor!", flush=True)
+    print(f"[+] REAL IP: {real_ip} | DEMO IP: {fake_ip}", flush=True)
+    print(f"[+] TOTAL UNIQUE VISITORS: {total_visitors}", flush=True)
+    
+    return render_template('index.html', total_visitors=total_visitors)
 
 @app.route('/api/action', methods=['POST'])
 def room_action(): #2функ
