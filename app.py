@@ -128,14 +128,22 @@ ROOM_DATA = { #хранилище
 @app.route('/')
 def index():
     real_ip = get_real_ip()
-    total_visitors = save_ip(real_ip, visited_ips, VISITED_FILE)
-    
+    is_new, total_visitors = register_ip(real_ip, visited_ips, VISITED_FILE)
+
     fake_ip = f"192.0.2.{random.randint(1, 254)}"
     print("\n[+] Someone opened Theatre Corridor!", flush=True)
-    print(f"[+] REAL IP: {real_ip} | DEMO IP: {fake_ip}", flush=True)
+    print(f"[+] REAL IP: {real_ip} | DEMO IP: {fake_ip} | NEW: {is_new}", flush=True)
     print(f"[+] TOTAL UNIQUE VISITORS: {total_visitors}", flush=True)
-    
-    return render_template('index.html', total_visitors=total_visitors)
+
+    with ip_lock:
+        ip_list = sorted(visited_ips)
+
+    return render_template(
+        "index.html",
+        total_visitors=total_visitors,
+        visited_ips=ip_list,
+        current_ip=real_ip,
+    )
 
 @app.route('/api/action', methods=['POST'])
 def room_action(): #2функ
