@@ -1,45 +1,69 @@
 
-
+from datetime import datetime
 import os
 import random
+import threading
 from flask import Flask, jsonify, render_template, request
 
 app = Flask(__name__)
-# Определяем точную папку, где лежит этот Python-файл
-VISITED_FILE = '/tmp/visited_ips.txt'
-TRAPPED_FILE = '/tmp/trapped_ips.txt'
 
-def load_ips(filename):
-    """Безопасно загружает сохранённые IP из файла при старте сервера."""
-    if not os.path.exists(filename):
-        return []
-    try:
-        with open(filename, 'r', encoding='utf-8', errors='ignore') as f:
-            return [line.strip() for line in f if line.strip()]
-    except Exception as e:
-        print(f"[WARNING] Не удалось прочитать {filename}: {e}", flush=True)
-        return []
+VISITED_FILE = "/tmp/visited_ips.txt"
+TRAPPED_FILE = "/tmp/trapped_ips.txt"
+ip_lock = threading.Lock()
 
-def save_ip(ip, ip_list, filename):
-    """Добавляет новый IP в список и дописывает его в файл."""
-    if ip not in ip_list:
-        ip_list.append(ip)
-        try:
-            with open(filename, 'a', encoding='utf-8') as f:
-                f.write(f"{ip}\n")
-        except Exception as e:
-            print(f"[WARNING] Не удалось записать в {filename}: {e}", flush=True)
-    return len(ip_list)
 
 def get_real_ip():
     """Возвращает IP клиента, переданный прокси, или адрес прямого подключения."""
-    forwarded_for = request.headers.get('X-Forwarded-For')
+    forwarded_for = request.headers.get("X-Forwarded-For")
     if forwarded_for:
-        return forwarded_for.split(',')[0].strip()
-    return request.remote_addr or 'unknown'
+        return forwarded_for.split(",")[0].strip()
+    return request.remote_addr or "unknown"
 
-visited_ips = load_ips(VISITED_FILE)
-trapped_ips = load_ips(TRAPPED_FILE)
+
+def load_ip_set(filename):
+    """Безопасно загружает сохранённые IP из файла при старте сервера."""
+    if not os.path.exists(filename):
+        return set()
+    try:
+        with open(filename, "r", encoding="utf-8", errors="ignore") as f:
+            ip_set = set()
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                # Поддерживаем оба формата: "timestamp | ip" и просто "ip"
+                ip = line.split("|")[-1].strip()
+                if ip:
+                    ip_set.add(ip)
+            return ip_set
+    except Exception as e:
+        print(f"[WARNING] Не удалось прочитать {filename}: {e}", flush=True)
+        return set()
+
+
+def register_ip(ip, ip_set, filename):
+    """Добавляет новый IP в множество и дописывает его в файл."""
+    if not ip or ip == "unknown":
+        return False, len(ip_set)
+
+    with ip_lock:
+        is_new = ip not in ip_set
+        if is_new:
+            ip_set.add(ip)
+            try:
+                parent_dir = os.path.dirname(filename)
+                if parent_dir:
+                    os.makedirs(parent_dir, exist_ok=True)
+                with open(filename, "a", encoding="utf-8") as f:
+                    timestamp = datetime.utcnow().isoformat(timespec="seconds")
+                    f.write(f"{timestamp} | {ip}\n")
+            except Exception as e:
+                print(f"[WARNING] Не удалось записать в {filename}: {e}", flush=True)
+        return is_new, len(ip_set)
+
+
+visited_ips = load_ip_set(VISITED_FILE)
+trapped_ips = load_ip_set(TRAPPED_FILE)
 
 ROOM_DATA = { #хранилище
     "room": {
